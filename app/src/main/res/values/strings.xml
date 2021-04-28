@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Projekt s16696</string>
+    <string name="dodaj_nowy_wpis">Dodaj nowy wpis</string>
+    <string name="zestawienie">Zestawienie</string>
+    <string-array name="options">
+        <item>Test1</item>
+        <item>Test12</item>
+        <item>Test123</item>
+    </string-array>
+</resources>
