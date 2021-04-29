@@ -4,16 +4,10 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.util.AttributeSet
 import android.view.View
-import com.anychart.AnyChart;
-import com.anychart.AnyChartView;
-import com.anychart.chart.common.dataentry.DataEntry
-import com.anychart.charts.Pie;
-import com.anychart.chart.common.dataentry.ValueDataEntry;
-import com.anychart.charts.Cartesian
+import java.util.*
+import kotlin.math.absoluteValue
 
 
 /*class ChartActivity : AppCompatActivity() {
@@ -49,9 +43,10 @@ class ChartActivity(context: Context, attributeSet: AttributeSet): View(context,
     private var xMax = 0
     private var yMin = 0
     private var yMax = 0
+    private var roznica = 0
 
     private val dataPointPaint = Paint().apply {
-        color = Color.BLUE
+        color = Color.RED
         strokeWidth = 7f
         style = Paint.Style.STROKE
     }
@@ -73,17 +68,30 @@ class ChartActivity(context: Context, attributeSet: AttributeSet): View(context,
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
         dataSet.forEachIndexed { index, currentDataPoint ->
             val realX = currentDataPoint.xVal.toRealX()
-            val realY = currentDataPoint.yVal.toRealY()
+            var realY = currentDataPoint.yVal.toRealY()
 
+            var status = false
+            if(realY<0){
+                realY = realY.absoluteValue
+                status =true
+            }
             if (index < dataSet.size - 1) {
                 val nextDataPoint = dataSet[index + 1]
                 val startX = currentDataPoint.xVal.toRealX()
-                val startY = currentDataPoint.yVal.toRealY()
+                var startY = currentDataPoint.yVal.toRealY()
+                if(startY<0){
+                    startY = startY.absoluteValue
+                }
                 val endX = nextDataPoint.xVal.toRealX()
-                val endY = nextDataPoint.yVal.toRealY()
+                var endY = 0f
+                if(status) {
+                    endY = nextDataPoint.yVal.toRealY().absoluteValue
+                    status = false
+                }else{
+                    endY = nextDataPoint.yVal.toRealY()
+                }
                 canvas.drawLine(startX, startY, endX, endY, dataPointLinePaint)
             }
 
@@ -95,11 +103,25 @@ class ChartActivity(context: Context, attributeSet: AttributeSet): View(context,
         canvas.drawLine(0f, height.toFloat(), width.toFloat(), height.toFloat(), axisLinePaint)
     }
 
-    fun setData(newDataSet: List<DataPoint>) {
-        xMin = newDataSet.minBy { it.xVal }?.xVal ?: 0
-        xMax = newDataSet.maxBy { it.xVal }?.xVal ?: 0
-        yMin = newDataSet.minBy { it.yVal }?.yVal ?: 0
-        yMax = newDataSet.maxBy { it.yVal }?.yVal ?: 0
+    fun setData(newDataSet: LinkedList<DataPoint>, min:Int, max:Int) {
+        xMin = newDataSet.minByOrNull { it.xVal }?.xVal ?: 0
+        xMax = newDataSet.maxByOrNull { it.xVal }?.xVal ?: 0
+        //yMin = newDataSet.minByOrNull { it.yVal }?.yVal ?: 0
+        //yMax = newDataSet.maxByOrNull { it.yVal }?.yVal ?: 0
+
+
+        yMin = min
+        yMax = max
+
+        roznica = (max.absoluteValue + min.absoluteValue) / 2
+/*
+        xMin = 0
+        xMax = 5
+        yMin = -50
+        yMax = 50
+*/
+
+
         dataSet.clear()
         dataSet.addAll(newDataSet)
         invalidate()
@@ -107,6 +129,9 @@ class ChartActivity(context: Context, attributeSet: AttributeSet): View(context,
 
     private fun Int.toRealX() = toFloat() / xMax * width
     private fun Int.toRealY() = toFloat() / yMax * height
+
+    private fun Int.toRealYminus() = -(toFloat() / yMax * height)
+
 }
 
 

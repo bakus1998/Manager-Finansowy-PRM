@@ -299,10 +299,13 @@ class AddActivity : AppCompatActivity() {
             Shared.transactionList.get(position1).data = dateLocal
             Shared.transactionList.get(position1).kategoria = kategoria
             Shared.transactionList.get(position1).czyPrzychod = czyPrzychod
+
+            Shared.transactionList.sortWith(compareBy<Transaction>{it.data.monthValue}.thenBy { it.data.dayOfMonth })
             finish()
         } else {
             val objectTransaction = Transaction(miejsce, kwotaKoncowa, dateLocal, kategoria, czyPrzychod)
             Shared.transactionList.add(objectTransaction)
+            Shared.transactionList.sortWith(compareBy<Transaction>{it.data.monthValue}.thenBy { it.data.dayOfMonth })
             finish()
         }
     }

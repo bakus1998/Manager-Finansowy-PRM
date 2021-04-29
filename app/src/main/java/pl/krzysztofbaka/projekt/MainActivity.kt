@@ -47,13 +47,18 @@ class MainActivity : AppCompatActivity() {
         var d = LocalDate.now()
         d= d.minusDays(5)
         d = d.minusMonths(3)
-        val sampleModel = Transaction("Wawa",-206.50, d,"Rozrywka",false);
-        val sampleModel1 = Transaction("McDonald",-36.50, LocalDate.now(),"Jedzenie",false);
-        val sampleModel2 = Transaction("Lotto",406.5, LocalDate.now(),"Zdrowie",true);
+        //val sampleModel = Transaction("Wawa",-206.50, d,"Rozrywka",false);
+        val sampleModel1 = Transaction("McDonald",-36.50, LocalDate.now().minusDays(5),"Jedzenie",false);
+        val sampleModel2 = Transaction("Lotto",406.5, LocalDate.now().minusDays(10),"Zdrowie",true);
+        val sampleModel3 = Transaction("Lotto",730.5, LocalDate.now().minusDays(22),"Zdrowie",true);
 
-        Shared.transactionList.add(sampleModel)
+
+        //Shared.transactionList.add(sampleModel)
         Shared.transactionList.add(sampleModel1)
         Shared.transactionList.add(sampleModel2)
+        Shared.transactionList.add(sampleModel3)
+
+        Shared.transactionList.sortWith(compareBy<Transaction>{it.data.monthValue}.thenBy { it.data.dayOfMonth })
 
 
 
