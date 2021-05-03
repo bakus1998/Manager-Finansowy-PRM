@@ -1,4 +1,4 @@
-package pl.krzysztofbaka.projekt
+package pl.krzysztofbaka.projekt.listener
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -7,21 +7,23 @@ import android.graphics.Color
 import android.os.Bundle
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import pl.krzysztofbaka.projekt.Shared
 import pl.krzysztofbaka.projekt.adapter.TransactionAdapter
+import pl.krzysztofbaka.projekt.model.Transaction
 
 class DeleteDialogFragment(position:Int, adapter : TransactionAdapter, test: TextView) : DialogFragment() {
-    val toRemovePosition = position
+    val toDeletePosition = position
     val transactionAdapter = adapter
     val textViewPodsumowanie = test
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
-            // Use the Builder class for convenient dialog construction
             val builder = AlertDialog.Builder(it)
             builder.setMessage("Czy na pewno chcesz usunąć ten wpis ?")
                     .setPositiveButton("Usuń",
                             DialogInterface.OnClickListener { dialog, id ->
-                                Shared.transactionList.removeAt(toRemovePosition)
+                                Shared.transactionList.removeAt(toDeletePosition)
+                                Shared.transactionList.sortWith(compareBy<Transaction>{it.data.monthValue}.thenBy { it.data.dayOfMonth })
                                 transactionAdapter.transactions = Shared.transactionList
                                 var podsumowanie =0.0;
                                 for(item in transactionAdapter.transactions){
@@ -33,12 +35,11 @@ class DeleteDialogFragment(position:Int, adapter : TransactionAdapter, test: Tex
                                 }else{
                                     textViewPodsumowanie.setTextColor(Color.RED)
                                 }
-
                             })
                     .setNegativeButton("Anuluj",
                             DialogInterface.OnClickListener { dialog, id ->
                             })
             builder.create()
-        } ?: throw IllegalStateException("Activity cannot be null")
+        } ?: throw IllegalStateException("Nie może być null!")
     }
 }

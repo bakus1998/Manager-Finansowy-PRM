@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".LineChartActivity">
 
-    <pl.krzysztofbaka.projekt.ChartActivity
+    <pl.krzysztofbaka.projekt.chart.ChartActivity
         android:id="@+id/graph_view"
         android:layout_width="0dp"
         android:layout_height="0dp"

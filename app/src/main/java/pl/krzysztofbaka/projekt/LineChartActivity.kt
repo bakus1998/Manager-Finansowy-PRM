@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 import kotlinx.android.synthetic.main.activity_chart.*
+import pl.krzysztofbaka.projekt.chart.DataPoint
 import pl.krzysztofbaka.projekt.databinding.ActivityChartBinding
 import pl.krzysztofbaka.projekt.model.Transaction
 import java.lang.Exception
@@ -43,7 +44,6 @@ class LineChartActivity : AppCompatActivity() {
         option = binding.spinner
         option.adapter =
             ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, options)
-        var sd =""
 
         option.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -67,14 +67,17 @@ class LineChartActivity : AppCompatActivity() {
                     if (transactionListCopy.get(i).data.monthValue==monthToCheck) {
                         minAndMax.add(transactionListCopy.get(i).kwota.toInt())
                         if(counter==0) {
-                            value += transactionListCopy.get(i).kwota.toInt()
+                            if(transactionListCopy.get(i).kwota.toInt()>0) {
+                                value += transactionListCopy.get(i).kwota.toInt()
+                            }else{
+                                value -= transactionListCopy.get(i).kwota.toInt()
+                            }
                             lista.add(
                                 DataPoint(
                                     transactionListCopy.get(i).data.dayOfMonth,
                                     value.toInt()
                                 )
                             )
-                            sd += transactionListCopy.get(i).data.dayOfMonth.toString() + " " + value.toString() + "\n"
                             counter++
                         }else{
                             if(transactionListCopy.get(i).kwota.toInt()>0){
@@ -98,17 +101,11 @@ class LineChartActivity : AppCompatActivity() {
                     }
                 }
 
-                var min =0;
-                var max=0;
                 try {
-                    min = minAndMax.minOrNull()!!
-                    max = minAndMax.maxOrNull()!!
-                    binding.textView2.setText(min.toString() + " " + max.toString())
-                    graph_view.setData(lista, min, max)
+                    graph_view.setData(lista)
 
                 }catch (e : Exception){
                     Toast.makeText(context, "Brak danych bądź brak przychodu", Toast.LENGTH_LONG).show()
-
                 }
             }
 

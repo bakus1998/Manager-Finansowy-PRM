@@ -1,21 +1,17 @@
 package pl.krzysztofbaka.projekt
 
-import android.R
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.SurfaceControl
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.DialogFragment
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.klim.tcharts.TChart
 import pl.krzysztofbaka.projekt.adapter.TransactionAdapter
+import pl.krzysztofbaka.projekt.chart.DataPoint
 import pl.krzysztofbaka.projekt.databinding.ActivityMainBinding
+import pl.krzysztofbaka.projekt.listener.DeleteDialogFragment
+import pl.krzysztofbaka.projekt.listener.RecyclerItemClickListener
 import pl.krzysztofbaka.projekt.model.Transaction
 import java.time.LocalDate
 import java.util.*
@@ -37,9 +33,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         intents = Intent(this,AddActivity::class.java)
-
         intents2 = Intent(this,LineChartActivity::class.java)
 
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         super.onCreate(savedInstanceState)
 
@@ -47,20 +43,17 @@ class MainActivity : AppCompatActivity() {
         var d = LocalDate.now()
         d= d.minusDays(5)
         d = d.minusMonths(3)
-        //val sampleModel = Transaction("Wawa",-206.50, d,"Rozrywka",false);
-        val sampleModel1 = Transaction("McDonald",-36.50, LocalDate.now().minusDays(5),"Jedzenie",false);
-        val sampleModel2 = Transaction("Lotto",406.5, LocalDate.now().minusDays(10),"Zdrowie",true);
-        val sampleModel3 = Transaction("Lotto",730.5, LocalDate.now().minusDays(22),"Zdrowie",true);
+        val sampleModel1 = Transaction("McDonald",-36.50, LocalDate.now().minusDays(10).plusMonths(1),"Jedzenie",false);
+        val sampleModel4 = Transaction("KFC",-60.50, LocalDate.now().minusDays(16).plusMonths(1),"Jedzenie",false);
+        val sampleModel2 = Transaction("Lotto",406.5, LocalDate.now().minusDays(13).plusMonths(1),"Zdrowie",true);
+        val sampleModel3 = Transaction("Lotto",730.5, LocalDate.now().minusDays(26).plusMonths(1),"Zdrowie",true);
 
-
-        //Shared.transactionList.add(sampleModel)
         Shared.transactionList.add(sampleModel1)
         Shared.transactionList.add(sampleModel2)
         Shared.transactionList.add(sampleModel3)
+        Shared.transactionList.add(sampleModel4)
 
         Shared.transactionList.sortWith(compareBy<Transaction>{it.data.monthValue}.thenBy { it.data.dayOfMonth })
-
-
 
         setupTransactionList()
         binding.buttonDodaj.setOnClickListener {
@@ -70,25 +63,19 @@ class MainActivity : AppCompatActivity() {
             startActivity(intents2)
         }
 
-        binding.transactionList.addOnItemTouchListener(RecyclerItemClickListenr(this, binding.transactionList, object : RecyclerItemClickListenr.OnItemClickListener {
+        binding.transactionList.addOnItemTouchListener(RecyclerItemClickListener(this, binding.transactionList, object : RecyclerItemClickListener.OnItemClickListener {
 
             override fun onItemClick(view: View, position: Int) {
                 intents.putExtra("editOrCreate", "edit")
                 intents.putExtra("position",position.toString())
                 startActivity(intents)
-
-                //transactionAdapter.transactions = Shared.transactionList
-
-
             }
             override fun onItemLongClick(view: View?, position: Int) {
-                val test =DeleteDialogFragment(position, transactionAdapter,binding.textViewPodsumowanie);
+                val test =
+                    DeleteDialogFragment(position, transactionAdapter,binding.textViewPodsumowanie);
                 val fragment = supportFragmentManager;
                 test.show(fragment,"")
                 setTextPodsumowanie()
-                //transactionAdapter.transactions = Shared.transactionList
-
-                //binding.buttonDodaj.setText(position.toString())
             }
 
         }))
@@ -137,12 +124,5 @@ class MainActivity : AppCompatActivity() {
         binding.textViewPodsumowanie.append(" zł")
     }
 
-
-    private fun generateRandomDataPoints(): List<DataPoint> {
-        val random = Random()
-        return (0..20).map {
-            DataPoint(it, random.nextInt(50) + 1)
-        }
-    }
 
 }
